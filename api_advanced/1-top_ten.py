@@ -1,38 +1,33 @@
-#!/usr/bin/python3
+ #!/usr/bin/python3
+
 """
-1-top_ten
-Queries the Reddit API and prints the titles of the first 10
-hot posts for a given subreddit. Falls back to mocked data if
-API is unreachable (offline checker-safe).
+prints the titles of the first 10 hot posts listed for a given subreddit
 """
 
-import requests
+from requests import get
 
 
 def top_ten(subreddit):
-    """Prints the titles of the first 10 hot posts for a subreddit."""
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {"User-Agent": "python:api_advanced:v1.0 (by /u/L-nsamba)"}
-    params = {"limit": 10}
+    """
+    function that queries the Reddit API and prints the titles of the first
+    10 hot posts listed for a given subreddit
+    """
+
+    if subreddit is None or not isinstance(subreddit, str):
+        print("None")
+
+    user_agent = {'User-agent': 'Google Chrome Version 81.0.4044.129'}
+    params = {'limit': 10}
+    url = 'https://www.reddit.com/r/{}/hot/.json'.format(subreddit)
+
+    response = get(url, headers=user_agent, params=params)
+    results = response.json()
 
     try:
-        response = requests.get(url, headers=headers,
-                                params=params, allow_redirects=False)
-        if response.status_code == 200:
-            posts = response.json().get("data", {}).get("children", [])
-            if not posts:
-                print(None)
-                return
-            for post in posts:
-                print(post.get("data", {}).get("title"))
-        else:
-            # Invalid subreddit
-            print(None)
+        my_data = results.get('data').get('children')
+
+        for i in my_data:
+            print(i.get('data').get('title'))
 
     except Exception:
-        # Fallback for offline / no internet (checker-safe)
-        if subreddit == "this_is_a_fake_subreddit":
-            print(None)
-        else:
-            # Mocked titles to satisfy the checker
-            print("OK")
+        print("None")
